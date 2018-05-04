@@ -3,7 +3,7 @@ Simple cellular automaton implementation. Designed for use in an educational set
 
 ## Example Output
 <p align="center">
-  <img src="https://i.imgur.com/K5dk8nC.gifv"></img>
+  <img src="https://i.imgur.com/K5dk8nC.gif"></img>
 </p>
 
 ## Command line arguments and controls
