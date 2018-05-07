@@ -7,6 +7,7 @@ from pyglet.gl import *
 import sys
 import getopt
 import rules
+import random
 
 FRAME_TIME = 1 / 15
 ON_COLOR = (0.2, 0.9, 0.2)
@@ -35,6 +36,13 @@ class Environment:
         for n in range(sim_size):
             self.edges.append((1, n))
             self.edges.append((sim_size - 1, n))
+
+    # populates grid with random pixels, density between 0(empty) and 1(full)
+    def random_populate(self, density=0.3):
+        for i in range(len(self.grid)):
+            for j in range(len(self.grid)):
+                if random.random() < density:
+                    self.grid[i][j] = 1
 
     def simulate(self, delta_time):
         next_grid = [[0 for i in range(self.sim_size)] for j in range(self.sim_size)]
@@ -69,10 +77,11 @@ def handle_arguments(full_cmd_arguments):
     scale = SCALE
     frame_time = FRAME_TIME
     rule = rules.seeds
+    populate = False
 
     argument_list = full_cmd_arguments[1:]
-    unix_options = "s:z:hf:r:"
-    gnu_options = ["scale=", "size=", "help", "frametime=", "rule="]
+    unix_options = "s:z:hf:r:p"
+    gnu_options = ["scale=", "size=", "help", "frametime=", "rule=", "populate"]
 
     try:
         arguments, values = getopt.getopt(argument_list, unix_options, gnu_options)
@@ -107,6 +116,7 @@ def handle_arguments(full_cmd_arguments):
             print("-z --size=      |  Set size of window in number of cells (INT)")
             print("-f --frametime= |  Set length of time between each frame in seconds (FLOAT)")
             print("-r --rule=      |  Set the simulation rule. Must be an exact function name in rules.py")
+            print("-p --populate   |  Populate the starting grid with random noise")
             sys.exit(0)
         if currentArgument in ("-f", "--frametime"):
             try:
@@ -119,14 +129,18 @@ def handle_arguments(full_cmd_arguments):
                 rule = eval("rules." + currentValue)
             except ValueError:
                 print("ERROR: Rule not found, using default rule (seeds) instead")
+        if currentArgument in ("-p", "--populate"):
+            populate = True
 
-    return sim_size, scale, frame_time, rule
+    return sim_size, scale, frame_time, rule, populate
 
 
 # -----------------------------------------------------Main Program-----------------------------------------------------
 def main():
-    sim_size, scale, frame_time, rule = handle_arguments(sys.argv)          # Handle command-line arguments
-    env = Environment(sim_size=sim_size, scale=scale, rule=rule)            # Initialize environment
+    sim_size, scale, frame_time, rule, populate = handle_arguments(sys.argv)    # Handle command-line arguments
+    env = Environment(sim_size=sim_size, scale=scale, rule=rule)                # Initialize environment
+    if populate:
+        env.random_populate()
     # Initialize window
     window = pyglet.window.Window(env.sim_size * env.scale, env.sim_size * env.scale,
                                   caption="Paused | SPACE to play/pause, click to add cells, R to reset | Iteration: 0")
