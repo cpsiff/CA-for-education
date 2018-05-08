@@ -64,8 +64,12 @@ def bubbles(grid, next_grid):
                     next_grid[i][j+1] = 1
 
                 elif choice == 4:               # split or DIE
-                    if random.choice([0, 0, 0, 1, 1, 1, 1]) == 1:
-                        next_grid[i+1][j+1] = 1
-                        next_grid[i-1][j-1] = 1
+                    if random.choice([0, 0, 0, 1, 1, 1, 1]):
+                        if random.choice([0,1]):
+                            next_grid[i+1][j+1] = 1
+                            next_grid[i-1][j] = 1
+                        else:
+                            next_grid[i+1][j] = 1
+                            next_grid[i-1][j+1] = 1
 
     return next_grid
